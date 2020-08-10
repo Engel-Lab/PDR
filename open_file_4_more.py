@@ -10,6 +10,7 @@ from tkinter import scrolledtext
 from tkinter.ttk import *
 import tkinter.font
 from tkinter import messagebox
+import time
 
 from Bio.Blast import NCBIWWW
 from Bio import AlignIO
@@ -83,9 +84,11 @@ def Check_Monkey(description_list):
         return (percentage >= int(combo3.get())), percentage, monkey_count, len(description_list) ###### you put equal sign here ####80.0%
 
 def activate_muscle(protein_name):
+        t0 = time.time() ########test
         cline = MuscleCommandline(input="{}/{}.faa".format(folder_name, protein_name), out="{}/{}.aln".format(folder_name, protein_name), clwstrict=True) 
         stdout, stderr = cline() # we use the muscle software to do the multiple alignments
-
+        t1 = time.time() ########test
+        print("muscle: {}".format(t1 - t0)) ######test
 
 def Restart():
         lbl1.configure(text = "")
@@ -224,8 +227,9 @@ class myThread(threading.Thread):
                 row_count = 1
                 try:
                         sheet = ReadExcel()
-                        final_sheet, final_book = CreateFolders(sheet)
-                except:
+                        CreateFolders(sheet) #final_sheet,
+                except Exception as e:
+                        print(str(e))
                         Restart()
                         problem_label.configure(text = "There has been a problem with the excel file chosen")
                         return
@@ -254,24 +258,33 @@ class myThread(threading.Thread):
                         summary = open("{}/hits/primate_hits/Summary.txt".format(folder_name), 'a+') 
                         
                         #print("start")
-                        check = create_files_per_protein(protein_name, sequence, final_sheet, log_file, summary, True)
+                        check = create_files_per_protein(protein_name, sequence, log_file, summary, True) #final_sheet, 
                         if(check[0] != 0):
                                 info_txt.insert(INSERT, "Error {}:\n{}\n{}) {} : Trying again\n".format(check[0], check[1], i+1, protein_name))
                                 log_file.write("Trying again\n")
 
-                                check = create_files_per_protein(protein_name, sequence, final_sheet, log_file, False)
+                                check = create_files_per_protein(protein_name, sequence, log_file, summary, False) #final_sheet, 
                                 if(check[0] == 1):
                                         info_txt.insert(INSERT, "Problem with BLAST: {}\n".format(check[1]))
+                                        
+                                        summary.write("Name: {}      Problem with BLAST: {}\n".format(protein_name, check[1])) ###
+                                        
                                         info_txt.insert(INSERT, "{}) {} : Aborted\n-------------------------------------\n".format(i+1, protein_name))
                                         log_file.write("Aborted\n")
                                         
                                 elif(check[0] == 2):
                                         info_txt.insert(INSERT, "No relevant hits found: {}\n".format(check[1]))
+
+                                        summary.write("Name: {}      No relevant hits found: {}\n".format(protein_name, check[1])) ###
+                                        
                                         info_txt.insert(INSERT, "{}) {} : Aborted\n-------------------------------------\n".format(i+1, protein_name))
                                         log_file.write("Aborted\n")
 
                                 elif(check[0] == 3):
                                         info_txt.insert(INSERT, "Problem with reading .aln file: {}\n".format(check[1]))
+
+                                        summary.write("Name: {}      Problem with reading .aln file: {}\n".format(protein_name, check[1])) ###
+                                        
                                         info_txt.insert(INSERT, "{}) {} : Aborted\n-------------------------------------\n".format(i+1, protein_name))
                                         log_file.write("Aborted\n")
 
@@ -287,11 +300,11 @@ class myThread(threading.Thread):
                         summary.close()
                         row_count += 1
                         #################
-                        final_book.save("{}/hits/primate_hits/Summary.xls".format(folder_name)) ### "{}/hits/monkey_hits/results.xls"
+                        #final_book.save("{}/hits/primate_hits/Summary.xls".format(folder_name)) ### "{}/hits/monkey_hits/results.xls"
                         #################
 
                 lbl2.configure(text = "Status : Finished")
-                final_book.save("{}/hits/primate_hits/Summary.xls".format(folder_name)) ### "{}/hits/monkey_hits/results.xls"
+                #final_book.save("{}/hits/primate_hits/Summary.xls".format(folder_name)) ### "{}/hits/monkey_hits/results.xls"
                 new_button.configure(state = NORMAL)
 
         def kill(self): 
@@ -345,25 +358,28 @@ def CreateFolders(sheet):
         if(not path.exists("{}/hits".format(folder_name))):
                 os.mkdir("{}/hits".format(folder_name))
                 os.mkdir("{}/hits/primate_hits".format(folder_name))
-
+        """
         final_book = Workbook()         ###### dont forget to close it
         final_sheet = final_book.add_sheet("results", cell_overwrite_ok = True)
         final_sheet.write(0, 0, "Entry name")
         final_sheet.write(0, 1, "Primate hits")
         final_sheet.write(0, 2, "Sequence")
-        
+             
         for i in range(0, sheet.nrows):
                 final_sheet.write(i+1, 0, str(sheet.cell_value(i,0))) #####be aware of indexes!!!!
                 final_sheet.write(i+1, 2, str(sheet.cell_value(i,1)))
-        
-        return final_sheet, final_book
+        """
 
 
 def activate_blast(protein_name, sequence):
         max_seq_num = combo1.get()
         #print(max_seq_num)
+        t0 = time.time() ########test
         result_handle = NCBIWWW.qblast("blastp", "nr", sequence, hitlist_size = int(max_seq_num), entrez_query = \
 "Mammalia[ALL] NOT (humans[ALL] OR 'Homo sapiens'[ALL])") #######change sequence!
+        t1 = time.time() ########test
+        print("blast: {}\n".format(t1 - t0)) ######test
+        
 
         file_name = "{}/{}.xml".format(folder_name, protein_name)
         with open("{}/{}.xml".format(folder_name, protein_name), "w") as out_handle:
@@ -372,15 +388,17 @@ def activate_blast(protein_name, sequence):
         out_handle.close()
         #print("blast ended")
 
-def create_files_per_protein(protein_name, sequence, final_sheet, log_file, summary, write_error):
+def create_files_per_protein(protein_name, sequence, log_file, summary, write_error): #, final_sheet
         global row_count
         global folder_name
         
         try:
                 activate_blast(protein_name, sequence)
         except Exception as e:
+                """
                 if(write_error == True):
                         final_sheet.write(row_count, 1, str(e))
+                """
                 #print("error 1")
                 log_file.write("Error while using blast: {}\n".format(str(e)))
                 return [1, str(e)]
@@ -408,8 +426,9 @@ def create_files_per_protein(protein_name, sequence, final_sheet, log_file, summ
                                         record.append(hit[0].hit)
         if len(record) == 1: ##### if no hits are left, end program for current protein
                 #print("#############No relevant hits found################")
-                if(write_error == True):
-                        final_sheet.write(row_count, 1, "No relevant orthologs returned by blast")
+                #if(write_error == True):
+                  #      summary.write("Name: {}      No relevant orthologs returned by blast\n".format(protein_name))
+                        #final_sheet.write(row_count, 1, "No relevant orthologs returned by blast")    
                 log_file.write("No relevant orthologs returned by blast\n")
                 return [2, "No relevant orthologs returned by blast"]
 
@@ -432,9 +451,12 @@ def create_files_per_protein(protein_name, sequence, final_sheet, log_file, summ
         except Exception as e:
                 #print("######### an exception has occured while trying to read the .aln file ############")
                 #print(e)
-                if(write_error == True):
-                                        final_sheet.write(row_count, 1, str(e))
-                log_file.write("Error while opening .aln file\n".format(str(e)))
+                
+                #if(write_error == True):
+                  #      summary.write("Name: {}      Error while opening .aln file\n".format(protein_name))
+                        #final_sheet.write(row_count, 1, str(e))
+               
+                log_file.write("Error while opening .aln file\n")
                 return [3, str(e)]
 
         
@@ -513,15 +535,17 @@ def create_files_per_protein(protein_name, sequence, final_sheet, log_file, summ
 
         if monkey_suspect:
                 shutil.copyfile("{}/{}_stat.txt".format(folder_name, protein_name), "{}/hits/primate_hits/{}_stat.txt".format(folder_name, protein_name))
-                final_sheet.write(row_count, 1, ", ".join(monkey_suspect_list))
+                summary.write("Name: {}      Prime hits: {}\n".format(protein_name, ", ".join(monkey_suspect_list)) )
+                #final_sheet.write(row_count, 1, ", ".join(monkey_suspect_list))
         else:
-                final_sheet.write(row_count, 1, "") ###if it succeeded on second time, remove previous error from excel table
+                summary.write("Name: {}      Prime hits: None\n".format(protein_name))
+                #final_sheet.write(row_count, 1, "") ###if it succeeded on second time, remove previous error from excel table
 
         os.remove("{}/{}.xml".format(folder_name, protein_name)) #erase unneccesary files
         os.remove("{}/{}.faa".format(folder_name, protein_name))
         os.remove("{}/{}.aln".format(folder_name, protein_name))
         log_file.write("Finished\n")
-        summary.write("Name: {}      Prime hits: {}\n".format(protein_name, ", ".join(monkey_suspect_list)) )
+        #summary.write("Name: {}      Prime hits: {}\n".format(protein_name, ", ".join(monkey_suspect_list)) )
         return [0, "Finished"]
 
 #########
