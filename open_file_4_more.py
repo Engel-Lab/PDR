@@ -42,7 +42,6 @@ def start():
         bttn1.configure(state=DISABLED)
         bttn2.configure(state=DISABLED)
         bttn3.configure(state=NORMAL)
-        #bttn4.configure(state=NORMAL)
         combo1.configure(state = DISABLED) ###
         combo2.configure(state = DISABLED)
         combo3.configure(state = DISABLED)
@@ -54,13 +53,7 @@ def start():
 def openfolder():
 	test_thread = TestThread()
 	test_thread.start()	
-"""
-def stop():
-        global currentThread
-        currentThread.kill()
-        currentThread = None
-        Restart()
-"""
+
 def find_C(sequence):
         c_list = []
         for s in range(len(sequence)):
@@ -88,7 +81,7 @@ def activate_muscle(protein_name):
         cline = MuscleCommandline(input="{}/{}.faa".format(folder_name, protein_name), out="{}/{}.aln".format(folder_name, protein_name), clwstrict=True) 
         stdout, stderr = cline() # we use the muscle software to do the multiple alignments
         t1 = time.time() ########test
-        print("muscle: {}".format(t1 - t0)) ######test
+        print("muscle: {}\n".format(t1 - t0)) ######test
 
 def Restart():
         lbl1.configure(text = "")
@@ -108,24 +101,7 @@ currentThread = None
 window = Tk()
 
 window.title("Primate Differential Redoxome (PDR)")
-
 window.geometry('950x620')
-
-###############################################
-"""
-menubutton = Menubutton(window, text = "Menu")
-menubutton.menu = Menu(menubutton)
-menubutton["menu"]= menubutton.menu
-menubutton.grid(row = 0, column = 0)
-var1 = IntVar() 
-var2 = IntVar() 
-var3 = IntVar() 
-menubutton.menu.add_checkbutton(label = "Courses", variable = var1) 
-menubutton.menu.add_checkbutton(label = "Students", variable = var2) 
-menubutton.menu.add_checkbutton(label = "Careers", variable = var3)
-menubutton.pack()   
-"""
-###############################################
 
 default_font = tkinter.font.nametofont("TkDefaultFont")
 default_font.configure(size=11)
@@ -143,8 +119,6 @@ combo1 = Combobox(f1)
 f1.grid(row = 1, column = 0, pady = 10)
 lbl4.pack(side = LEFT)
 combo1.pack(side = LEFT)
-#lbl4.grid(row = 1, column = 0) ###
-#combo1.grid(row = 2, column = 0)
 combo1['values']= (250, 300, 350, 400, 450, 500)
 combo1.current(0) #set to default
 
@@ -154,23 +128,18 @@ combo2 = Combobox(f2)
 f2.grid(row = 2, column = 0, pady = 10)
 lbl5.pack(side = LEFT)
 combo2.pack(side = LEFT)
-#lbl5.grid(row = 3, column = 0)
-#combo2.grid(row = 4, column = 0)
 combo2['values']= (70, 80, 90)
 combo2.current(1) #set to default
 
-#######################################
 f3 = Frame(window)
 lbl7 = Label(f3, text = "      Cys conservation, <(%) : ")
 combo4 = Combobox(f3)
 f3.grid(row = 3, column = 0, pady = 10)
 lbl7.pack(side = LEFT)
 combo4.pack(side = LEFT)
-#lbl7.grid(row = 5, column = 0)
-#combo4.grid(row =6, column = 0)
 combo4['values']= (10, 20, 30, 40, 50)
 combo4.current(2) #set to default
-#######################################
+
 
 f4 = Frame(window)
 lbl6 = Label(f4, text = "            Cys primates, >(%) : ")
@@ -178,8 +147,6 @@ combo3 = Combobox(f4)
 f4.grid(row = 4, column = 0, pady = 10)
 lbl6.pack(side = LEFT)
 combo3.pack(side = LEFT)
-#lbl6.grid(row = 7, column = 0)
-#combo3.grid(row =8, column = 0)
 combo3['values']= (70, 80, 90)
 combo3.current(1) #set to default
 
@@ -200,13 +167,6 @@ info_txt.grid(row = 8, column = 0)
 
 bttn3 = Button(window, text="Open results", command=openfolder, state = DISABLED)
 bttn3.grid(row = 9, column = 0, pady = 10)
-
-"""
-bttn4 = Button(window, text="Stop", command=stop, state = DISABLED)
-bttn4.grid(row = 6, column = 1)
-"""
-#lbl3 = Label(window)
-#lbl3.grid(row = 14, column = 0)
 
 problem_label = Label(window)
 problem_label.grid(row = 9, column = 1, pady = 10)
@@ -257,17 +217,16 @@ class myThread(threading.Thread):
 
                         summary = open("{}/hits/primate_hits/Summary.txt".format(folder_name), 'a+') 
                         
-                        #print("start")
-                        check = create_files_per_protein(protein_name, sequence, log_file, summary, True) #final_sheet, 
+                        check = create_files_per_protein(protein_name, sequence, log_file, summary, True, i) #final_sheet, 
                         if(check[0] != 0):
                                 info_txt.insert(INSERT, "Error {}:\n{}\n{}) {} : Trying again\n".format(check[0], check[1], i+1, protein_name))
                                 log_file.write("Trying again\n")
 
-                                check = create_files_per_protein(protein_name, sequence, log_file, summary, False) #final_sheet, 
+                                check = create_files_per_protein(protein_name, sequence, log_file, summary, False, i) #final_sheet, 
                                 if(check[0] == 1):
                                         info_txt.insert(INSERT, "Problem with BLAST: {}\n".format(check[1]))
                                         
-                                        summary.write("Name: {}      Problem with BLAST: {}\n".format(protein_name, check[1])) ###
+                                        summary.write("{}) {}\tProblem with BLAST: {}\n".format(i+1, protein_name, check[1])) ###
                                         
                                         info_txt.insert(INSERT, "{}) {} : Aborted\n-------------------------------------\n".format(i+1, protein_name))
                                         log_file.write("Aborted\n")
@@ -275,7 +234,7 @@ class myThread(threading.Thread):
                                 elif(check[0] == 2):
                                         info_txt.insert(INSERT, "No relevant hits found: {}\n".format(check[1]))
 
-                                        summary.write("Name: {}      No relevant hits found: {}\n".format(protein_name, check[1])) ###
+                                        summary.write("{}) {}\tNo relevant hits found: {}\n".format(i+1, protein_name, check[1])) ###
                                         
                                         info_txt.insert(INSERT, "{}) {} : Aborted\n-------------------------------------\n".format(i+1, protein_name))
                                         log_file.write("Aborted\n")
@@ -283,7 +242,7 @@ class myThread(threading.Thread):
                                 elif(check[0] == 3):
                                         info_txt.insert(INSERT, "Problem with reading .aln file: {}\n".format(check[1]))
 
-                                        summary.write("Name: {}      Problem with reading .aln file: {}\n".format(protein_name, check[1])) ###
+                                        summary.write("Name: {}\tProblem with reading .aln file: {}\n".format(protein_name, check[1])) ###
                                         
                                         info_txt.insert(INSERT, "{}) {} : Aborted\n-------------------------------------\n".format(i+1, protein_name))
                                         log_file.write("Aborted\n")
@@ -292,19 +251,12 @@ class myThread(threading.Thread):
                                         info_txt.insert(INSERT, "{}) {} : Finished\n-------------------------------------\n".format(i+1, protein_name))
                         else:
                                 info_txt.insert(INSERT, "{}) {} : Finished\n-------------------------------------\n".format(i+1, protein_name))
-                                #info_txt.insert(INSERT, "Finished Successfully\n")
-
-                        
-                        #info_txt.insert(INSERT, "{}) {} : Ended\n-------------------------------------\n".format(i+1, protein_name))
+                                
                         log_file.close()
                         summary.close()
                         row_count += 1
-                        #################
-                        #final_book.save("{}/hits/primate_hits/Summary.xls".format(folder_name)) ### "{}/hits/monkey_hits/results.xls"
-                        #################
 
                 lbl2.configure(text = "Status : Finished")
-                #final_book.save("{}/hits/primate_hits/Summary.xls".format(folder_name)) ### "{}/hits/monkey_hits/results.xls"
                 new_button.configure(state = NORMAL)
 
         def kill(self): 
@@ -317,12 +269,11 @@ class TestThread(threading.Thread):
                 global folder_name
                 try:
                         see = os.path.abspath(os.path.dirname(sys.argv[0]))
-                        path = (see + "\\" + folder_name + "\\").replace("/", "\\") ###chek this \\ or /, replace sys.path[0] with see
+                        path = (see + "\\" + folder_name + "\\").replace("/", "\\")
                         os.startfile(path) ###for windows only! ####test
                         ####subprocess.call("nautilus -- {}".format(path), shell = True) ### for linux
                         return
                 except Exception as e:
-                        #print(str(e))
                         return
 
 monkeys_file = "Primates.xlsx"
@@ -358,18 +309,6 @@ def CreateFolders(sheet):
         if(not path.exists("{}/hits".format(folder_name))):
                 os.mkdir("{}/hits".format(folder_name))
                 os.mkdir("{}/hits/primate_hits".format(folder_name))
-        """
-        final_book = Workbook()         ###### dont forget to close it
-        final_sheet = final_book.add_sheet("results", cell_overwrite_ok = True)
-        final_sheet.write(0, 0, "Entry name")
-        final_sheet.write(0, 1, "Primate hits")
-        final_sheet.write(0, 2, "Sequence")
-             
-        for i in range(0, sheet.nrows):
-                final_sheet.write(i+1, 0, str(sheet.cell_value(i,0))) #####be aware of indexes!!!!
-                final_sheet.write(i+1, 2, str(sheet.cell_value(i,1)))
-        """
-
 
 def activate_blast(protein_name, sequence):
         max_seq_num = combo1.get()
@@ -378,17 +317,15 @@ def activate_blast(protein_name, sequence):
         result_handle = NCBIWWW.qblast("blastp", "nr", sequence, hitlist_size = int(max_seq_num), entrez_query = \
 "Mammalia[ALL] NOT (humans[ALL] OR 'Homo sapiens'[ALL])") #######change sequence!
         t1 = time.time() ########test
-        print("blast: {}\n".format(t1 - t0)) ######test
+        print("blast: {}".format(t1 - t0)) ######test
         
-
         file_name = "{}/{}.xml".format(folder_name, protein_name)
         with open("{}/{}.xml".format(folder_name, protein_name), "w") as out_handle:
                 out_handle.write(result_handle.read())
         result_handle.close()
         out_handle.close()
-        #print("blast ended")
 
-def create_files_per_protein(protein_name, sequence, log_file, summary, write_error): #, final_sheet
+def create_files_per_protein(protein_name, sequence, log_file, summary, write_error, protein_index): #, final_sheet
         global row_count
         global folder_name
         
@@ -399,7 +336,6 @@ def create_files_per_protein(protein_name, sequence, log_file, summary, write_er
                 if(write_error == True):
                         final_sheet.write(row_count, 1, str(e))
                 """
-                #print("error 1")
                 log_file.write("Error while using blast: {}\n".format(str(e)))
                 return [1, str(e)]
         
@@ -424,11 +360,7 @@ def create_files_per_protein(protein_name, sequence, log_file, summary, write_er
                                         pass
                                 else:
                                         record.append(hit[0].hit)
-        if len(record) == 1: ##### if no hits are left, end program for current protein
-                #print("#############No relevant hits found################")
-                #if(write_error == True):
-                  #      summary.write("Name: {}      No relevant orthologs returned by blast\n".format(protein_name))
-                        #final_sheet.write(row_count, 1, "No relevant orthologs returned by blast")    
+        if len(record) == 1: ##### if no hits are left, end program for current protein  
                 log_file.write("No relevant orthologs returned by blast\n")
                 return [2, "No relevant orthologs returned by blast"]
 
@@ -449,17 +381,8 @@ def create_files_per_protein(protein_name, sequence, log_file, summary, write_er
         try:
                 alignment = AlignIO.read("{}/{}.aln".format(folder_name, protein_name), "clustal")
         except Exception as e:
-                #print("######### an exception has occured while trying to read the .aln file ############")
-                #print(e)
-                
-                #if(write_error == True):
-                  #      summary.write("Name: {}      Error while opening .aln file\n".format(protein_name))
-                        #final_sheet.write(row_count, 1, str(e))
-               
                 log_file.write("Error while opening .aln file\n")
                 return [3, str(e)]
-
-        
 
         stat_file = open("{}/{}_stat.txt".format(folder_name, protein_name), 'w') # file in which we will write all our statistics
 
@@ -509,15 +432,11 @@ def create_files_per_protein(protein_name, sequence, log_file, summary, write_er
         suspect = False
         monkey_suspect = False
         special_suspect = False
-
-        #final_sheet.write(row_count, 0, protein_name)
-        #final_sheet.write(row_count, 2, sequence)
         monkey_suspect_list = []
 
         for j in range(len(count_list)):
                 if round(count_list[j] * 100.0 / (len(alignment)-1), 1) < int(combo4.get()):
                         suspect = True
-                        #print(protein_matrix[j])#####
                         is_monkey, percentage, monkey_count, length = Check_Monkey([protein_dict[i] for i in protein_matrix[j]])
                         if is_monkey or len(protein_matrix[j]) < 6:
                                 monkey_suspect = True
@@ -535,26 +454,21 @@ def create_files_per_protein(protein_name, sequence, log_file, summary, write_er
 
         if monkey_suspect:
                 shutil.copyfile("{}/{}_stat.txt".format(folder_name, protein_name), "{}/hits/primate_hits/{}_stat.txt".format(folder_name, protein_name))
-                summary.write("Name: {}      Prime hits: {}\n".format(protein_name, ", ".join(monkey_suspect_list)) )
-                #final_sheet.write(row_count, 1, ", ".join(monkey_suspect_list))
+                summary.write("{}) {}\t{}\n".format(protein_index+1, protein_name, ", ".join(monkey_suspect_list)) )
         else:
-                summary.write("Name: {}      Prime hits: None\n".format(protein_name))
-                #final_sheet.write(row_count, 1, "") ###if it succeeded on second time, remove previous error from excel table
+                summary.write("{}) {}\n".format(protein_index+1, protein_name))
 
         os.remove("{}/{}.xml".format(folder_name, protein_name)) #erase unneccesary files
         os.remove("{}/{}.faa".format(folder_name, protein_name))
         os.remove("{}/{}.aln".format(folder_name, protein_name))
         log_file.write("Finished\n")
-        #summary.write("Name: {}      Prime hits: {}\n".format(protein_name, ", ".join(monkey_suspect_list)) )
         return [0, "Finished"]
 
-#########
 def on_closing():
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
         window.destroy()
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
-#########
 window.mainloop()
 
 
