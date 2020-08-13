@@ -1,5 +1,5 @@
 ## PDR, Version v_1.1 <br>
-OS requirements: Windows 10 <br>
+**Requirements: OS Windows 10 and Internet connection.** <br>
 
 **The PDR – Primate Differential Redoxome** is an analytic program that detects unique cysteine residues in a query human protein sequence(s) present only in the primate orthologs of mammals. The program's algorithm uploads query protein sequence(s) onto the BLAST (NCBI)server, retrieves orthologous non-human mammalian sequences, aligns the retrieved and the query sequences, and identifies cysteine residues in the human query, which are present only in the primate orthologues.
 How to use PDR program:
