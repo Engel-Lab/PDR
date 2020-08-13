@@ -73,7 +73,7 @@ def Check_Monkey(description_list):
         if(len(description_list) != 0):
                 percentage = round(100.0 * monkey_count / len(description_list), 1)
         else:
-                return True, 0.0, 0, 0
+                return True, 100.0, 0, 0
         return (percentage >= int(combo3.get())), percentage, monkey_count, len(description_list) ###### you put equal sign here ####80.0%
 
 def activate_muscle(protein_name):
@@ -97,6 +97,9 @@ def Restart():
         combo4.configure(state = NORMAL)
         lbl2.configure(text = "")
 
+def Open_Info():
+        os.system('start README.docx')
+
 currentThread = None
 window = Tk()
 
@@ -106,15 +109,18 @@ window.geometry('950x620')
 default_font = tkinter.font.nametofont("TkDefaultFont")
 default_font.configure(size=11)
 
-bttn1 = Button(window, text="Choose input file", command=findfile)
-bttn1.grid(row = 0, column = 0, pady = 10)
+f5 = Frame(window)
+bttn1 = Button(f5, text="Choose input file", command=findfile)
+bttn4 = Button(f5, text="Info", command=Open_Info)
+f5.grid(row = 0, column = 0, pady = 10)
+bttn1.pack(side = RIGHT, padx = 20)
+bttn4.pack(side = LEFT, padx = 20)
 
 lbl1 = Label(window)
 lbl1.grid(row = 0, column = 1)
 
-
 f1 = Frame(window)
-lbl4 = Label(f1, text = "               Ortholog number : ")
+lbl4 = Label(f1, text = "               Orthologs number : ")
 combo1 = Combobox(f1)
 f1.grid(row = 1, column = 0, pady = 10)
 lbl4.pack(side = LEFT)
@@ -139,7 +145,6 @@ lbl7.pack(side = LEFT)
 combo4.pack(side = LEFT)
 combo4['values']= (10, 20, 30, 40, 50)
 combo4.current(2) #set to default
-
 
 f4 = Frame(window)
 lbl6 = Label(f4, text = "            Cys primates, >(%) : ")
@@ -202,7 +207,7 @@ class myThread(threading.Thread):
                 log_file = open("{}/{}_log.log".format(folder_name, folder_name), 'w') # file in which we will record all progress, log file
                 log_file.close()
                 
-                summary = open("{}/hits/primate_hits/Summary.txt".format(folder_name), 'w') 
+                summary = open("{}/Summary.txt".format(folder_name), 'w') 
                 summary.close()
 
                 lbl2.configure(text = "Status : Running")
@@ -215,7 +220,7 @@ class myThread(threading.Thread):
                         log_file.write("{}      {}      ".format(i + 1, protein_name))
                         info_txt.insert(INSERT, "{}) {} : Started\n".format(i+1, protein_name))
 
-                        summary = open("{}/hits/primate_hits/Summary.txt".format(folder_name), 'a+') 
+                        summary = open("{}/Summary.txt".format(folder_name), 'a+') 
                         
                         check = create_files_per_protein(protein_name, sequence, log_file, summary, True, i) #final_sheet, 
                         if(check[0] != 0):
@@ -226,7 +231,7 @@ class myThread(threading.Thread):
                                 if(check[0] == 1):
                                         info_txt.insert(INSERT, "Problem with BLAST: {}\n".format(check[1]))
                                         
-                                        summary.write("{}) {}\tProblem with BLAST: {}\n".format(i+1, protein_name, check[1])) ###
+                                        summary.write("{}\tProblem with BLAST: {}\n".format(protein_name, check[1])) ###
                                         
                                         info_txt.insert(INSERT, "{}) {} : Aborted\n-------------------------------------\n".format(i+1, protein_name))
                                         log_file.write("Aborted\n")
@@ -234,7 +239,7 @@ class myThread(threading.Thread):
                                 elif(check[0] == 2):
                                         info_txt.insert(INSERT, "No relevant hits found: {}\n".format(check[1]))
 
-                                        summary.write("{}) {}\tNo relevant hits found: {}\n".format(i+1, protein_name, check[1])) ###
+                                        summary.write("{}\tNo relevant hits found: {}\n".format(protein_name, check[1])) ###
                                         
                                         info_txt.insert(INSERT, "{}) {} : Aborted\n-------------------------------------\n".format(i+1, protein_name))
                                         log_file.write("Aborted\n")
@@ -242,7 +247,7 @@ class myThread(threading.Thread):
                                 elif(check[0] == 3):
                                         info_txt.insert(INSERT, "Problem with reading .aln file: {}\n".format(check[1]))
 
-                                        summary.write("Name: {}\tProblem with reading .aln file: {}\n".format(protein_name, check[1])) ###
+                                        summary.write("{}\tProblem with reading .aln file: {}\n".format(protein_name, check[1])) ###
                                         
                                         info_txt.insert(INSERT, "{}) {} : Aborted\n-------------------------------------\n".format(i+1, protein_name))
                                         log_file.write("Aborted\n")
@@ -454,9 +459,9 @@ def create_files_per_protein(protein_name, sequence, log_file, summary, write_er
 
         if monkey_suspect:
                 shutil.copyfile("{}/{}_stat.txt".format(folder_name, protein_name), "{}/hits/primate_hits/{}_stat.txt".format(folder_name, protein_name))
-                summary.write("{}) {}\t{}\n".format(protein_index+1, protein_name, ", ".join(monkey_suspect_list)) )
+                summary.write("{}\t{}\n".format(protein_name, ",".join(monkey_suspect_list)) )
         else:
-                summary.write("{}) {}\n".format(protein_index+1, protein_name))
+                summary.write("{}\n".format(protein_name))
 
         os.remove("{}/{}.xml".format(folder_name, protein_name)) #erase unneccesary files
         os.remove("{}/{}.faa".format(folder_name, protein_name))
