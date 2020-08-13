@@ -5,13 +5,13 @@ How to use PDR program:
  
 2.	Choose Input.xlsx file containing the names and sequences of query human protein(s). The input file might be created by modifying the example Input.xlsx file found in the package.
  
-3.	Adjust parameter 'Orthologs number' to define how many ortholog proteins to be retrieved by BLAST (default value 250).
+3.	Adjust parameter **'Orthologs number'** to define how many ortholog proteins to be retrieved by BLAST (default value 250).
 
-4.	Adjust parameter 'Sequence identity' to define the lower limit of protein identity to the query protein. The default value is 80%, which means that only the proteins with sequence identity >80% to the query will be retrieved by BLAST. 
+4.	Adjust parameter **'Sequence identity'** to define the lower limit of protein identity to the query protein. The default value is 80%, which means that only the proteins with sequence identity >80% to the query will be retrieved by BLAST. 
  
-5.	Adjust parameter 'Cys conservation' to set the upper limit of cysteine conservation. The default value is 30%, which means that if the query protein contains at least one cysteine residue, which is present in no more than 30% of the aligned orthologs (at the same position), the query will be subjected to further analysis.
+5.	Adjust parameter **'Cys conservation'** to set the upper limit of cysteine conservation. The default value is 30%, which means that if the query protein contains at least one cysteine residue, which is present in no more than 30% of the aligned orthologs (at the same position), the query will be subjected to further analysis.
 
-6.	Adjust parameter 'Cys primates', which defines the lower limit of primate identity in the conserved orthologues. The default value is 80%, which means that at least 80% of the orthologous, in which a particular aligned cysteine is conserved, are required to be from primates in order the query to be assigned to the PDR.
+6.	Adjust parameter **'Cys primates'**, which defines the lower limit of primate identity in the conserved orthologues. The default value is 80%, which means that at least 80% of the orthologous, in which a particular aligned cysteine is conserved, are required to be from primates in order the query to be assigned to the PDR.
 
 7.	Press Start.
 
@@ -22,5 +22,5 @@ How to cite the PDR program:
 Nachiyappan Venkatachalam, Shamchal Bakavayev, Daniel Engel, Zeev Barak, Stanislav Engel, Primate Differential Redoxome (PDR) – a paradigm for understanding neurodegenerative diseases, Redox Biology, 2020, https://doi.org/10.1016/j.redox.2020.101683.
 
 How to contact us: <br>
-E. mail: engels@bgu.ac.il <br>
+E. mail: engels@bgu.ac.il <br><br>
 All rights reserved.  
