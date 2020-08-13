@@ -22,6 +22,9 @@ How to use PDR program:
 10.	The accessibility and performance of the BLAST server is the rate-limiting factor in this calculation, which varies on a daily-hourly basis.   
 How to cite the PDR program:
 Nachiyappan Venkatachalam, Shamchal Bakavayev, Daniel Engel, Zeev Barak, Stanislav Engel, Primate Differential Redoxome (PDR) – a paradigm for understanding neurodegenerative diseases, Redox Biology, 2020, https://doi.org/10.1016/j.redox.2020.101683.
+11. Special case: When very few orthologs with a cysteine at the
+same position as in the query are found in Step 6 (less than
+5), the query is automatically assigned to the PDR.
 
 How to contact us: <br>
 E. mail: engels@bgu.ac.il <br><br>
