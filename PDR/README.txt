@@ -8,7 +8,7 @@ The PDR – Primate Differential Redoxome is an analytic program that detects uniq
 
 How to use PDR program:
 
-1. Download PDR.zip package from https://github.com/Engel-Lab/PDR site and extract in a working directory. Launch the program by clicking PDR.exe.
+1. Press the "Code" button and choose "Download ZIP" Download PDR.zip package from https://github.com/Engel-Lab/PDR site and extract in a working directory. Launch the program by clicking PDR.exe.
  
 2. Choose Input.xlsx file containing the names and sequences of query human protein(s). The input file might be created by modifying the example Input.xlsx file found in the package.
  
