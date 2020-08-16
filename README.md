@@ -3,7 +3,7 @@
 
 **The PDR – Primate Differential Redoxome** is an analytic program that detects unique cysteine residues in a query human protein sequence(s) present only in the primate orthologs of mammals. The program's algorithm uploads query protein sequence(s) onto the BLAST (NCBI)server, retrieves orthologous non-human mammalian sequences, aligns the retrieved and the query sequences, and identifies cysteine residues in the human query, which are present only in the primate orthologues.
 How to use PDR program:
-1.	Download PDR.zip package from https://github.com/Engel-Lab/PDR site and extract in a working directory. Launch the program by clicking PDR.exe.
+1.	Download PDR.zip package from https://github.com/Engel-Lab/PDR site to a working directory by pressing "Code" button and choosing "Download ZIP". Extract package, and launch the program by clicking PDR.exe.
  
 2.	Choose Input.xlsx file containing the names and sequences of query human protein(s). The input file might be created by modifying the example Input.xlsx file found in the package.
  
